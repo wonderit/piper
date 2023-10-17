@@ -4,3 +4,5 @@
 !src/cpp/
 !local/en-us/lessac/low/en-us-lessac-low.onnx
 !local/en-us/lessac/low/en-us-lessac-low.onnx.json
+!voices/es_ES-sharvard-medium.onnx
+!voices/es_ES-sharvard-medium.onnx.json

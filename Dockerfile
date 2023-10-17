@@ -2,14 +2,6 @@ FROM quay.io/pypa/manylinux_2_28_x86_64 as build-amd64
 
 FROM quay.io/pypa/manylinux_2_28_aarch64 as build-arm64
 
-FROM debian:bullseye as build-armv7
-
-RUN apt-get update && \
-    apt-get install --yes --no-install-recommends \
-        build-essential cmake ca-certificates curl pkg-config
-
-# -----------------------------------------------------------------------------
-
 ARG TARGETARCH
 ARG TARGETVARIANT
 FROM build-${TARGETARCH}${TARGETVARIANT} as build
@@ -54,19 +46,19 @@ RUN mkdir -p piper && \
 
 # -----------------------------------------------------------------------------
 
-FROM debian:bullseye as test
+FROM debian:buster as test
 ARG TARGETARCH
 ARG TARGETVARIANT
 
 WORKDIR /test
 
-COPY local/en-us/lessac/low/en-us-lessac-low.onnx \
-     local/en-us/lessac/low/en-us-lessac-low.onnx.json ./
+COPY ./voices/es_ES-sharvard-medium.onnx \
+     ./voices/es_ES-sharvard-medium.onnx.json ./
 
 # Run Piper on a test sentence and verify that the WAV file isn't empty
 COPY --from=build /dist/piper_*.tar.gz ./
 RUN tar -xzf piper*.tar.gz
-RUN echo 'This is a test.' | ./piper/piper -m en-us-lessac-low.onnx -f test.wav
+RUN echo 'This is a test.' | ./piper/piper -m es_ES-sharvard-medium.onnx -f test.wav
 RUN if [ ! -f test.wav ]; then exit 1; fi
 RUN size="$(wc -c < test.wav)"; \
     if [ "${size}" -lt "1000" ]; then echo "File size is ${size} bytes"; exit 1; fi
